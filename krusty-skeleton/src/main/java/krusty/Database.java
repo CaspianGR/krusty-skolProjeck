@@ -39,7 +39,7 @@ public class Database {
 			// Use "jdbc:mysql://puccini.cs.lth.se/" + userName if you using our shared
 			// server
 			// If outside, this statement will hang until timeout.
-			conn = DriverManager.getConnection("jdbc:sqlite:L2_lokal_DB.db", userName, password);
+			conn = DriverManager.getConnection("jdbc:sqlite:L2_lokal_DB.db", jdbcUsername, jdbcPassword);
 		} catch (SQLException e) {
 			System.err.println(e);
 			e.printStackTrace();
