@@ -98,7 +98,17 @@ public class Database {
 	}
 
 	public String getRecipes(Request req, Response res) {
-		return "{}";
+		String sql = "SELECT cookie,raw_material,amount,unit FROM Recipes";
+
+		try (PreparedStatement ps = conn.prepareStatement(sql)) {
+			try (ResultSet rs = ps.executeQuery()) {
+				String json = JSONizer.toJSON(ResultSet, "customers"); 
+    			return json; 
+				
+			}
+		} catch (SQLException e) {
+			return "{}";
+		}
 	}
 
 	public String getPallets(Request req, Response res) {
