@@ -1,90 +1,66 @@
-CREATE TABLE products (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE
+SET DATABASE SQL LOWER CASE IDENTIFIER TRUE;
+
+CREATE TABLE IF NOT EXISTS Customers(
+	name			VARCHAR(100),
+	address			VARCHAR(200),
+
+	PRIMARY KEY (name)
 );
 
-CREATE TABLE recipes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    product_id INT NOT NULL,
-    valid_from DATETIME NOT NULL,
-    valid_to DATETIME,
-    FOREIGN KEY (product_id) REFERENCES products(id)
+CREATE TABLE IF NOT EXISTS Orders(
+	id				INTEGER IDENTITY NOT NULL,
+	customer_name	VARCHAR(100) NOT NULL,
+	order_made_at	TIMESTAMP NOT NULL,
+	desired_delivery_date	DATE,
+
+	FOREIGN KEY (customer_name) REFERENCES Customers(name)
 );
 
-CREATE TABLE ingredients (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE,
-    stock_quantity FLOAT NOT NULL,
-    unit VARCHAR(50) NOT NULL
+CREATE TABLE IF NOT EXISTS Cookies(
+	name			VARCHAR(100),
+
+	PRIMARY KEY (name)
 );
 
-CREATE TABLE recipe_ingredients (
-    recipe_id INT NOT NULL,
-    ingredient_id INT NOT NULL,
-    amount_per_100_cookies FLOAT NOT NULL,
-    PRIMARY KEY (recipe_id, ingredient_id),
-    FOREIGN KEY (recipe_id) REFERENCES recipes(id),
-    FOREIGN KEY (ingredient_id) REFERENCES ingredients(id)
+CREATE TABLE IF NOT EXISTS Pallets(
+	id				INTEGER IDENTITY NOT NULL,
+	cookie			VARCHAR(100) NOT NULL,
+	production_date	TIMESTAMP NOT NULL,
+	order_id		INTEGER,
+	delivered_at	TIMESTAMP,
+	blocked			BOOLEAN NOT NULL,
+
+	FOREIGN KEY (order_id) REFERENCES Orders(id),
+	FOREIGN KEY (cookie) REFERENCES Cookies(name)
 );
 
-CREATE TABLE ingredient_deliveries (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    ingredient_id INT NOT NULL,
-    quantity FLOAT NOT NULL,
-    delivery_time DATETIME NOT NULL,
-    FOREIGN KEY (ingredient_id) REFERENCES ingredients(id)
+CREATE TABLE IF NOT EXISTS OrderLines(
+	order_id		INTEGER NOT NULL,
+	cookie			VARCHAR(100) NOT NULL,
+	pallets			INTEGER NOT NULL,
+
+	PRIMARY KEY (order_id, cookie),
+	FOREIGN KEY (order_id) REFERENCES Orders(id),
+	FOREIGN KEY (cookie) REFERENCES Cookies(name)
 );
 
-CREATE TABLE pallets (
-    id INT PRIMARY KEY,
-    product_id INT NOT NULL,
-    production_time DATETIME NOT NULL,
-    status VARCHAR(50) NOT NULL,
-    FOREIGN KEY (product_id) REFERENCES products(id)
+CREATE TABLE IF NOT EXISTS RawMaterials(
+	name			VARCHAR(100) NOT NULL,
+	amount			INTEGER NOT NULL,
+	unit			VARCHAR(10) NOT NULL,
+	last_order_amount	INTEGER, -- NOT NULL,
+	last_order_time	TIMESTAMP, -- NOT NULL,
+
+	PRIMARY KEY (name)
 );
 
-CREATE TABLE customers (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    address VARCHAR(255) NOT NULL
-);
+CREATE TABLE IF NOT EXISTS Recipes(
+	cookie			VARCHAR(100) NOT NULL,
+	raw_material	VARCHAR(100) NOT NULL,
+	amount			INTEGER NOT NULL,
+	unit			VARCHAR(10) NOT NULL,
 
-CREATE TABLE orders (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_id INT NOT NULL,
-    order_time DATETIME NOT NULL,
-    delivery_time DATETIME,
-    FOREIGN KEY (customer_id) REFERENCES customers(id)
-);
-
-CREATE TABLE order_items (
-    order_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity_pallets INT NOT NULL,
-    PRIMARY KEY (order_id, product_id),
-    FOREIGN KEY (order_id) REFERENCES orders(id),
-    FOREIGN KEY (product_id) REFERENCES products(id)
-);
-
-CREATE TABLE deliveries (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    delivery_time DATETIME NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(id)
-);
-
-CREATE TABLE delivery_pallets (
-    delivery_id INT NOT NULL,
-    pallet_id INT NOT NULL,
-    PRIMARY KEY (delivery_id, pallet_id),
-    FOREIGN KEY (delivery_id) REFERENCES deliveries(id),
-    FOREIGN KEY (pallet_id) REFERENCES pallets(id)
-);
-
-CREATE TABLE blocked_intervals (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    product_id INT NOT NULL,
-    start_time DATETIME NOT NULL,
-    end_time DATETIME NOT NULL,
-    FOREIGN KEY (product_id) REFERENCES products(id)
+	PRIMARY KEY (cookie, raw_material),
+	FOREIGN KEY (cookie) REFERENCES Cookies(name),
+	FOREIGN KEY (raw_material) REFERENCES RawMaterials(name)
 );
