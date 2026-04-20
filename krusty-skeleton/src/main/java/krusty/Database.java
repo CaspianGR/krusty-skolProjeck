@@ -137,6 +137,9 @@ public class Database {
     	 blocked = req.queryParams("blocked"); 
 		t += 1;
 		}
+
+
+		// inte skydat mot sql injection 
 		if(t != 1){
 			sql += " where ";
 			if(from != ""){
