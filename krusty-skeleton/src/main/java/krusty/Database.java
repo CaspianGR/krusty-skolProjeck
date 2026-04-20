@@ -112,6 +112,75 @@ public class Database {
 	}
 
 	public String getPallets(Request req, Response res) {
+		Stirng förfrågan = 
+		String sql = "SELECT id, cookie, production_date, customer, blocked FROM Pallets";
+		int t = 0;
+		
+		String from = "";
+		String to = "";
+		String cookie = "";
+		String blocked = "";
+		
+		if (req.queryParams("from") != null) { 
+    	from = req.queryParams("from"); 
+		t += 1;
+		}
+		if (req.queryParams("to") != null) { 
+    	to = req.queryParams("to"); 
+		t += 1;
+		}
+		if (req.queryParams("cookie") != null) { 
+    	 cookie = req.queryParams("cookie"); 
+		t += 1;
+		}
+		if (req.queryParams("blocked") != null) { 
+    	 blocked = req.queryParams("blocked"); 
+		t += 1;
+		}
+		if(t != 1){
+			sql += " where ";
+			if(from != ""){
+				sql += "production_date > " from;
+				t--;
+				if(t != 0){
+					sql +=" and "
+				}
+
+			}
+			if(to != "" && t != 0){
+				sql += "production_date < " from;
+				t--;
+				if(t != 0){
+					sql +=" and "
+				}
+
+			}
+			if(cookie != "" && t != 0){
+				sql += "cookie = " cookie;
+				t--;
+				if(t != 0){
+					sql +=" and "
+				}
+
+			}
+			if(blocked != "" && t != 0){
+				if(blocked == "yes"){
+					sql += "blocked = true";
+				}
+				else if(blocked == "no"){
+					sql += "blocked = false";
+				}
+				
+				
+
+			}
+
+		}
+		
+
+
+
+
 		return "{\"pallets\":[]}";
 	}
 
