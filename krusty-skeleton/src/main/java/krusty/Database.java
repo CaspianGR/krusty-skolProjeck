@@ -60,7 +60,7 @@ public class Database {
 				
 			}
 		} catch (SQLException e) {
-			return "{}";
+			throw new RuntimeException(e);
 		}
 
 
@@ -79,7 +79,7 @@ public class Database {
 				
 			}
 		} catch (SQLException e) {
-			return "{}";
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class Database {
 				
 			}
 		} catch (SQLException e) {
-			return "{}";
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -107,78 +107,51 @@ public class Database {
 				
 			}
 		} catch (SQLException e) {
-			return "{}";
+			throw new RuntimeException(e);
 		}
 	}
 
 	public String getPallets(Request req, Response res) {
-		Stirng förfrågan = 
-		String sql = "SELECT id, cookie, production_date, customer, blocked FROM Pallets";
-		int t = 0;
-		
-		String from = "";
-		String to = "";
-		String cookie = "";
-		String blocked = "";
-		
-		if (req.queryParams("from") != null) { 
-    	from = req.queryParams("from"); 
-		t += 1;
+		String sql = """
+			SELECT id, cookie, production_date, Orders.customer_name AS customer, RTRIM(CASEWHEN(blocked, 'yes', 'no')) AS blocked FROM Pallets
+			LEFT OUTER JOIN Orders ON Orders.id=Pallets.order_id""";
+
+		ArrayList<Object> values = new ArrayList<>();
+
+		if (req.queryParams("from") != null) {
+			sql += " WHERE production_date >= ?";
+			values.add(req.queryParams("from"));
 		}
-		if (req.queryParams("to") != null) { 
-    	to = req.queryParams("to"); 
-		t += 1;
+		if (req.queryParams("to") != null) {
+			sql += (!values.isEmpty() ? " AND " : " WHERE ") + "production_date <= ?";
+			values.add(req.queryParams("to"));
 		}
-		if (req.queryParams("cookie") != null) { 
-    	 cookie = req.queryParams("cookie"); 
-		t += 1;
+		if (req.queryParams("cookie") != null) {
+			sql += (!values.isEmpty() ? " AND " : " WHERE ") + "cookie = ?";
+			values.add(req.queryParams("cookie"));
 		}
-		if (req.queryParams("blocked") != null) { 
-    	 blocked = req.queryParams("blocked"); 
-		t += 1;
+		if (req.queryParams("blocked") != null) {
+			sql += (!values.isEmpty() ? " AND " : " WHERE ") + "blocked = ?";
+			values.add(switch (req.queryParams("blocked")) {
+				case "yes" -> true;
+				case "no" -> false;
+				default -> throw new IllegalArgumentException("blocked=" + req.queryParams("blocked"));
+			});
 		}
 
-
-		// inte skydat mot sql injection 
-		if(t != 1){
-			sql += " where ";
-			if(from != ""){
-				sql += "production_date > " from;
-				t--;
-				if(t != 0){
-					sql +=" and "
+		try (var ps = c.prepareStatement(sql)) {
+			for (int i = 0; i < values.size(); i++) {
+				Object v = values.get(i);
+				if (v instanceof String s) {
+					ps.setString(i + 1, s);
+				} else if (v instanceof Boolean b) {
+					ps.setBoolean(i + 1, b);
 				}
-
 			}
-			if(to != "" && t != 0){
-				sql += "production_date < " from;
-				t--;
-				if(t != 0){
-					sql +=" and "
-				}
-
-			}
-			if(cookie != "" && t != 0){
-				sql += "cookie = " cookie;
-				t--;
-				if(t != 0){
-					sql +=" and "
-				}
-
-			}
-			if(blocked != "" && t != 0){
-				if(blocked == "yes"){
-					sql += "blocked = true";
-				}
-				else if(blocked == "no"){
-					sql += "blocked = false";
-				}
-				
-				
-
-			}
-
-		}
+			return Jsonizer.toJson(ps.executeQuery(), "pallets");
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}		
 		
 
 
@@ -188,7 +161,28 @@ public class Database {
 	}
 
 	public String reset(Request req, Response res) {
-		return "{}";
+		try {
+			c.setAutoCommit(false);
+			SqlFile sqlFile = new SqlFile(getClass().getResource("/reset-schema.sql"), "UTF-8");
+			sqlFile.setConnection(this.c);
+			sqlFile.execute();
+			c.commit();
+			return """
+					{"status": "ok"}""";
+		} catch (IOException | SQLException | SqlToolError e) {
+			try {
+				c.rollback();
+			} catch (SQLException rollbackEx) {
+				throw new RuntimeException("Rollback failed: " + rollbackEx.getMessage());
+			}
+			throw new RuntimeException("Reset failed: " + e.getMessage());
+		} finally {
+			try {
+				c.setAutoCommit(true);
+			} catch (SQLException e) {
+				logger.error("Could not set auto commit status: {}", e.getMessage());
+			}
+		}
 	}
 
 	public String createPallet(Request req, Response res) {
