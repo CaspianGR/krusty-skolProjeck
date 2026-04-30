@@ -3,11 +3,14 @@ package krusty;
 import spark.Request;
 import spark.Response;
 
+import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -39,7 +42,7 @@ public class Database {
 			// Use "jdbc:mysql://puccini.cs.lth.se/" + userName if you using our shared
 			// server
 			// If outside, this statement will hang until timeout.
-			conn = DriverManager.getConnection("jdbc:sqlite:L2_lokal_DB.db", jdbcUsername, jdbcPassword);
+			conn = DriverManager.getConnection("jdbc:sqlite:mysqlite-kacka.db", jdbcUsername, jdbcPassword);
 		} catch (SQLException e) {
 			System.err.println(e);
 			e.printStackTrace();
@@ -112,9 +115,7 @@ public class Database {
 	}
 
 	public String getPallets(Request req, Response res) {
-		String sql = """
-			SELECT id, cookie, production_date, Orders.customer_name AS customer, RTRIM(CASEWHEN(blocked, 'yes', 'no')) AS blocked FROM Pallets
-			LEFT OUTER JOIN Orders ON Orders.id=Pallets.order_id""";
+		String sql = "SELECT id, cookie, production_date, Orders.customer_name AS customer, RTRIM(CASEWHEN(blocked, 'yes', 'no')) AS blocked FROM Pallets LEFT OUTER JOIN Orders ON Orders.id=Pallets.order_id";
 
 		ArrayList<Object> values = new ArrayList<>();
 
@@ -132,11 +133,22 @@ public class Database {
 		}
 		if (req.queryParams("blocked") != null) {
 			sql += (!values.isEmpty() ? " AND " : " WHERE ") + "blocked = ?";
-			values.add(switch (req.queryParams("blocked")) {
-				case "yes" -> true;
-				case "no" -> false;
-				default -> throw new IllegalArgumentException("blocked=" + req.queryParams("blocked"));
-			});
+			String t ="";
+			switch(req.queryParams("blocked")) {
+  				case "yes":
+				break;
+				case "no":
+
+				break;
+  				default:
+					throw new IllegalArgumentException("blocked=" + req.queryParams("blocked"))
+					
+			}
+			values.add(t);
+
+
+
+
 		}
 
 		try (var ps = c.prepareStatement(sql)) {
