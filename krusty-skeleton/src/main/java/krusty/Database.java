@@ -141,7 +141,7 @@ public class Database {
 
 				break;
   				default:
-					throw new IllegalArgumentException("blocked=" + req.queryParams("blocked"))
+					throw new IllegalArgumentException("blocked=" + req.queryParams("blocked"));
 					
 			}
 			values.add(t);
@@ -179,8 +179,7 @@ public class Database {
 			sqlFile.setConnection(this.c);
 			sqlFile.execute();
 			c.commit();
-			return """
-					{"status": "ok"}""";
+			return "{"status": "ok"}";
 		} catch (IOException | SQLException | SqlToolError e) {
 			try {
 				c.rollback();
