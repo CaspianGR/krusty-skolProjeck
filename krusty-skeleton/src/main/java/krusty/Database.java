@@ -170,7 +170,7 @@ public class Database {
 
 	public String createPallet(Request req, Response res) {
 		
-
+//den här koden är skräåj jag orkar inte att fixa den
 
 		String lägTillPall = "INSERT INTO Pallets (id,cookie, production_date, order_id,delivered_at,blocked) VALUES (?,?, LOCALTIMESTAMP,?,LOCALTIMESTAMP, ?)";
 		String ValdKacka = req.queryParams("cookie");
