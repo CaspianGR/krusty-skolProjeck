@@ -71,7 +71,7 @@ public class Database {
 	}
 
 	public String getCookies(Request req, Response res) {
-		return GetDatta("SELECT name FROM products",kont,"cookies");
+		return GetDatta("SELECT name FROM Cookies",kont,"cookies");
 	}
 
 	public String getRecipes(Request req, Response res) {
