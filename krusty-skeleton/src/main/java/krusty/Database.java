@@ -1,17 +1,7 @@
 package krusty;
 
-import spark.Request;
-import spark.Response;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeMap;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -21,9 +11,6 @@ import java.util.ArrayList;
 
 import spark.Request;
 import spark.Response;
-
-
-import static krusty.Jsonizer.toJson;
 
 public class Database {
 	private Connection kont;
@@ -61,7 +48,51 @@ public class Database {
 	}
 
 	public String getPallets(Request req, Response res) {
-		return "{\"pallets\":[]}";
+		String fråga ="";
+		ArrayList<String> values = new ArrayList<String>();
+		boolean f = true;
+
+		if (req.queryParams("from") != null) {
+			fråga += f ? " WHERE " : " AND ";
+			fråga += "WHERE production_date >= ?";
+			values.add(req.queryParams("to"));
+			f = false;
+		}
+		if (req.queryParams("to") != null) {
+			fråga += f ? " WHERE " : " AND ";
+			fråga += "WHERE production_date <= ?";
+			values.add(req.queryParams("to"));
+			f = false;
+		}
+		if (req.queryParams("cookie") != null) {
+			fråga += f ? " WHERE " : " AND ";
+			fråga += "cookie = ?";
+			values.add(req.queryParams("to"));
+			f = false;
+		}
+		if (req.queryParams("to") != null) {
+			fråga += f ? " WHERE " : " AND ";
+			if (req.queryParams("blocked").equals("yes")){
+				fråga += "blocked = yes";
+			}
+			else{
+				fråga += "blocked = no";
+			}
+		}
+		try (PreparedStatement stmt = kont.prepareStatement(fråga)) { 
+    		for (int i = 0; i < values.size(); i++) { 
+      			stmt.setString(i+1, values.get(i)); 
+    		} 
+    		ResultSet R = stmt.executeQuery(); 
+			return Jsonizer.toJson(R, "pallets");
+  		} catch (SQLException e) { 
+			e.printStackTrace();
+			return "{\"pallets\": []}";
+		} 
+
+
+
+
 	}
 
 	public String reset(Request req, Response res) {
