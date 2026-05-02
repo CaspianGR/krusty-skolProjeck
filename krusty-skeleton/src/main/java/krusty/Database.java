@@ -165,6 +165,7 @@ public class Database {
 
 			kont.commit();
 			kont.setAutoCommit(true);
+			return "{\"status\": \"ok\", \"id\": " + paletId + "}";
 
 		}
 		catch (SQLException e) {
