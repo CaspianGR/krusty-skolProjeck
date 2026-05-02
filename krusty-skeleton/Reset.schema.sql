@@ -3,13 +3,13 @@ PRAGMA foreign_keys = ON;
 
 -- Ta bort gamla tabeller 
 PRAGMA foreign_keys = OFF; -- SQLite 
-drop table if exists RecipeItems;
-drop table if exists OrderItems;
-drop table if exists Pallets;
-drop table if exists Orders;
-drop table if exists Ingredients;
-drop table if exists Cookies;
 drop table if exists Customers;
+drop table if exists Orders;
+drop table if exists Cookies;
+drop table if exists Pallets;
+drop table if exists OrderLines;
+drop table if exists RawMaterials;
+drop table if exists Recipes;
 PRAGMA foreign_keys = ON; -- SQLite
 
 INSERT INTO Customers (name, address) VALUES ('Bjudkakor AB', 'Ystad');
