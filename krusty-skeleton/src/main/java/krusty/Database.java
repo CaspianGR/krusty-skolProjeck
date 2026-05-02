@@ -2,11 +2,13 @@ package krusty;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.checkerframework.checker.units.qual.N;
@@ -17,17 +19,42 @@ import spark.Response;
 public class Database {
 	private Connection kont;
 
-	private static final String jdbcString = "jdbc:kacker:.db";
+	private static final String jdbcString = "jdbc:sqlite:kacker.db";
 
 
 	public void connect() {
 		try{
 			kont = DriverManager.getConnection(jdbcString);
+			
+			StringBuilder stringBuilder = new StringBuilder();
+			
+			BufferedReader reader = new BufferedReader(new FileReader ("create.schema.sql"));
+			String line = null;
+			
 
 			
-		}
-		catch(SQLException t){
+			while((line = reader.readLine()) != null) {
+				if(line.length()>0 && line.charAt(1)!= '-')
+					stringBuilder.append(line);
+				stringBuilder.append("\n");
+			}
+				String s =  stringBuilder.toString();
+				String[] sL = s.split(";");
+				for(int i =0; i< sL.length; i++){
+					if(sL[i] != ""){
+					try (Statement pstmt = kont.createStatement()) {
+								pstmt.execute(sL[i]+";");
+							}
+				}
+				}
+
+
+				
+			
+			reader.close();
+		} catch(Exception t ){
 			t.printStackTrace();
+
 		}
 	}
 
@@ -106,15 +133,19 @@ public class Database {
 
     			
      				while((line = reader.readLine()) != null) {
-        		    if(line.charAt(1)!= '-')
+        		    if(line.length()>0 && line.charAt(1)!= '-'){
 						stringBuilder.append(line);
-						stringBuilder.append("\n");
+						stringBuilder.append("\n");}
 		}
 		String s =  stringBuilder.toString();
 		if(s != ""){
-			try (PreparedStatement pstmt = kont.prepareStatement(s)) {
+			String[]sT = s.split(";");
+			for (String sTs: sT) {
+				try (PreparedStatement pstmt = kont.prepareStatement(sTs + ";")) {
 						pstmt.executeUpdate();
 					}
+			}
+			
 		}
 		reader.close();
 		return "{\"statos\": \"= )\"}";
@@ -153,7 +184,7 @@ public class Database {
 			}
 			try(PreparedStatement sKapaPaler = kont.prepareStatement(lägTillPall,java.sql.Statement.RETURN_GENERATED_KEYS)){
 				sKapaPaler.setString(1, ValdKacka);
-				sKapaPaler.setString(2, "no");
+				sKapaPaler.setString(2, "false");
 				sKapaPaler.executeUpdate();
 				ResultSet Nyklar = sKapaPaler.getGeneratedKeys();
 				Nyklar.next();
@@ -182,7 +213,7 @@ public class Database {
 
 
 
-return "{}";
+
 	}
 	private String GetDatta(String fråga, Connection kont, String Destinaton){
 		try (
