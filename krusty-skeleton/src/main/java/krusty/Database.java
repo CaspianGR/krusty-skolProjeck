@@ -141,7 +141,8 @@ public class Database {
 		if(s != ""){
 			String[]sT = s.split(";");
 			for (String sTs: sT) {
-				try (PreparedStatement pstmt = kont.prepareStatement(sTs + ";")) {
+				String sadf= sTs + ";";
+				try (PreparedStatement pstmt = kont.prepareStatement(sadf)) {
 						pstmt.executeUpdate();
 					}
 			}
