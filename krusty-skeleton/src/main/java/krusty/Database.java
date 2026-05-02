@@ -159,11 +159,12 @@ public class Database {
 				Nyklar.next();
 				paletId = Nyklar.getInt(1);
 			}
-			
 
 
 
 
+			kont.commit();
+			kont.setAutoCommit(true);
 
 		}
 		catch (SQLException e) {
