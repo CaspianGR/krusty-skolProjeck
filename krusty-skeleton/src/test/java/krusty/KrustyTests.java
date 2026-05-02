@@ -63,9 +63,9 @@ public class KrustyTests {
 		createPallet("Amneris");
 		createPallet("Amneris");
 		createPallet("Berliner");
-		
-		String expected = readFile("ExpectedRawMaterialsAfterCreatingPallets.json");
-		String actual = getURL("raw-materials");
+		//den här failar eftersom att nogon inte angav de räta mängderna 
+		 String expected = readFile("ExpectedRawMaterialsAfterCreatingPallets.json");
+												String actual = getURL("raw-materials");
 
 		JSONAssert.assertEquals(expected, actual, false);
 	}

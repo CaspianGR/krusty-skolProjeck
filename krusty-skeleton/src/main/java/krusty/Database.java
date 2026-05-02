@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.checkerframework.checker.units.qual.N;
 
@@ -63,7 +64,8 @@ public class Database {
 	// TODO: Implement and change output in all methods below!
 
 	public String getCustomers(Request req, Response res) {
-		return GetDatta("SELECT name,address FROM customers",kont,"customers");
+		
+		return GetDatta("SELECT name,address FROM Customers",kont,"customers");
 	}
 
 	public String getRawMaterials(Request req, Response res) {
@@ -127,6 +129,7 @@ public class Database {
 	}
 
 	public String reset(Request req, Response res) {
+		System.out.println("safjeashuif");
 		StringBuilder stringBuilder = new StringBuilder();
 		try{
 			    BufferedReader reader = new BufferedReader(new FileReader ("Reset.schema.sql"));
@@ -169,7 +172,7 @@ public class Database {
 		
 
 
-		String lägTillPall = "INSERT INTO Pallets (cookie, production_date, blocked) VALUES (?, LOCALTIMESTAMP, ?)";
+		String lägTillPall = "INSERT INTO Pallets (id,cookie, production_date, order_id,delivered_at,blocked) VALUES (?,?, LOCALTIMESTAMP,?,LOCALTIMESTAMP, ?)";
 		String ValdKacka = req.queryParams("cookie");
 		int paletId;
 		if(ValdKacka == null){
@@ -178,7 +181,7 @@ public class Database {
 
 		try{
 			kont.setAutoCommit(false);
-			String SeOmKakaFins = "SELECT name FROM products WHERE name = ?";
+			String SeOmKakaFins = "SELECT name FROM Cookies WHERE name = ?";
 			try(PreparedStatement pstmt = kont.prepareStatement(SeOmKakaFins)){
 				pstmt.setString(1, ValdKacka);
 				ResultSet r = pstmt.executeQuery();
@@ -188,8 +191,12 @@ public class Database {
 				}
 			}
 			try(PreparedStatement sKapaPaler = kont.prepareStatement(lägTillPall,java.sql.Statement.RETURN_GENERATED_KEYS)){
-				sKapaPaler.setString(1, ValdKacka);
-				sKapaPaler.setString(2, "false");
+				Random r= new Random();
+				
+				String[]Alternativ = {Integer.toString(0),ValdKacka,Integer.toString(r.nextInt(1000)),"false"};
+				for(int i =0; i< Alternativ.length; i++){
+					sKapaPaler.setString(i++, Alternativ[i]);
+				}
 				sKapaPaler.executeUpdate();
 				ResultSet Nyklar = sKapaPaler.getGeneratedKeys();
 				Nyklar.next();
