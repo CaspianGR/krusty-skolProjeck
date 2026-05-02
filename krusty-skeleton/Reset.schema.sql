@@ -1,15 +1,16 @@
-SET DATABASE REFERENTIAL INTEGRITY FALSE;
+-- Aktivera främmande nycklar
+PRAGMA foreign_keys = ON;
 
-TRUNCATE TABLE Recipes AND COMMIT;
-TRUNCATE TABLE Pallets AND COMMIT;
-TRUNCATE TABLE Orders AND COMMIT;
-TRUNCATE TABLE OrderLines AND COMMIT;
-
-TRUNCATE TABLE Customers AND COMMIT;
-TRUNCATE TABLE Cookies AND COMMIT;
-TRUNCATE TABLE RawMaterials AND COMMIT;
-
-SET DATABASE REFERENTIAL INTEGRITY TRUE;
+-- Ta bort gamla tabeller 
+PRAGMA foreign_keys = OFF; -- SQLite 
+drop table if exists RecipeItems;
+drop table if exists OrderItems;
+drop table if exists Pallets;
+drop table if exists Orders;
+drop table if exists Ingredients;
+drop table if exists Cookies;
+drop table if exists Customers;
+PRAGMA foreign_keys = ON; -- SQLite
 
 INSERT INTO Customers (name, address) VALUES ('Bjudkakor AB', 'Ystad');
 INSERT INTO Customers (name, address) VALUES ('Finkakor AB', 'Helsingborg');
