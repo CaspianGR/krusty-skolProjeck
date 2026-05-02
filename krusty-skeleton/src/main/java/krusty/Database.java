@@ -41,16 +41,18 @@ public class Database {
 				String s =  stringBuilder.toString();
 				String[] sL = s.split(";");
 				for(int i =0; i< sL.length; i++){
-					if(sL[i] != ""){
+					if(sL[i] != null && sL[i].length() >2){
 					try (Statement pstmt = kont.createStatement()) {
 								pstmt.execute(sL[i]+";");
 							}
+						if(i == 16){
+							int ewf=1;						}
 				}
 				}
 
 
 				
-			
+			reset(null, null);
 			reader.close();
 		} catch(Exception t ){
 			t.printStackTrace();
@@ -65,7 +67,7 @@ public class Database {
 	}
 
 	public String getRawMaterials(Request req, Response res) {
-		return GetDatta("SELECT name,stock_quantity,unit FROM ingredients",kont,"raw-materials");
+		return GetDatta("SELECT name,stock_quantity,unit FROM RawMaterials",kont,"raw-materials");
 	}
 
 	public String getCookies(Request req, Response res) {
@@ -139,12 +141,14 @@ public class Database {
 		}
 		String s =  stringBuilder.toString();
 		if(s != ""){
-			String[]sT = s.split(";");
+			String[]sT = s.split("\n");
 			for (String sTs: sT) {
-				String sadf= sTs + ";";
-				try (PreparedStatement pstmt = kont.prepareStatement(sadf)) {
-						pstmt.executeUpdate();
-					}
+				if(sTs.length() >2){
+					String sadf= sTs + "";
+					try (PreparedStatement pstmt = kont.prepareStatement(sadf)) {
+							pstmt.executeUpdate();
+						}
+				}
 			}
 			
 		}

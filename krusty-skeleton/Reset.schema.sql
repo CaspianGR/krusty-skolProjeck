@@ -1,12 +1,13 @@
 
+PRAGMA foreign_keys = OFF;
 DELETE FROM Customers;
+DELETE FROM OrderLines;
 DELETE FROM Orders;
 DELETE FROM Cookies;
 DELETE FROM Pallets;
-DELETE FROM OrderLines;
 DELETE FROM RawMaterials;
 DELETE FROM Recipes;
-
+PRAGMA foreign_keys = ON;
 
 INSERT INTO Customers (name, address) VALUES ('Bjudkakor AB', 'Ystad');
 INSERT INTO Customers (name, address) VALUES ('Finkakor AB', 'Helsingborg');
