@@ -67,7 +67,7 @@ public class Database {
 	}
 
 	public String getRawMaterials(Request req, Response res) {
-		return GetDatta("SELECT name,stock_quantity,unit FROM RawMaterials",kont,"raw-materials");
+		return GetDatta("SELECT name,amount,unit FROM RawMaterials",kont,"raw-materials");
 	}
 
 	public String getCookies(Request req, Response res) {
