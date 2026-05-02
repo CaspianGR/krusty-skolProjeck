@@ -48,7 +48,7 @@ public class Database {
 	}
 
 	public String getPallets(Request req, Response res) {
-		String fråga ="";
+		String fråga ="SELECT id, cookie, production_date, Orders.customer_name AS customer, RTRIM(CASEWHEN(blocked, 'yes', 'no')) AS blocked FROM Pallets LEFT OUTER JOIN Orders ON Orders.id=Pallets.order_id";
 		ArrayList<String> values = new ArrayList<String>();
 		boolean f = true;
 
