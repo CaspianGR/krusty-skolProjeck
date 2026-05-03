@@ -43,7 +43,7 @@ public class ServerMain {
 		get(API_ENTRYPOINT + "/cookies", (req, res) -> db.getCookies(req, res));
 		get(API_ENTRYPOINT + "/recipes", (req, res) -> db.getRecipes(req, res));
 		get(API_ENTRYPOINT + "/pallets", (req, res) -> db.getPallets(req, res));
-		
+
 		post(API_ENTRYPOINT + "/reset", (req, res) -> db.reset(req, res));
 		post(API_ENTRYPOINT + "/pallets", (req, res) -> db.createPallet(req, res));
 	}
