@@ -1,0 +1,8 @@
+{
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-11",
+      "path": "C:\\Program Files\\Eclipse Adoptium\\jdk-11"
+    }
+  ]
+}
