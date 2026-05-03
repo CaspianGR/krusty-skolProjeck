@@ -17,6 +17,7 @@ public class ServerMain {
 
 		db = new Database();
 		db.connect();
+		
 
 		port(PORT);
 		

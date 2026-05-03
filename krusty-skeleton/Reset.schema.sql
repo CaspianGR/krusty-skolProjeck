@@ -1,15 +1,13 @@
-SET DATABASE REFERENTIAL INTEGRITY FALSE;
 
-TRUNCATE TABLE Recipes AND COMMIT;
-TRUNCATE TABLE Pallets AND COMMIT;
-TRUNCATE TABLE Orders AND COMMIT;
-TRUNCATE TABLE OrderLines AND COMMIT;
-
-TRUNCATE TABLE Customers AND COMMIT;
-TRUNCATE TABLE Cookies AND COMMIT;
-TRUNCATE TABLE RawMaterials AND COMMIT;
-
-SET DATABASE REFERENTIAL INTEGRITY TRUE;
+PRAGMA foreign_keys = OFF;
+DELETE FROM Customers;
+DELETE FROM OrderLines;
+DELETE FROM Orders;
+DELETE FROM Cookies;
+DELETE FROM Pallets;
+DELETE FROM RawMaterials;
+DELETE FROM Recipes;
+PRAGMA foreign_keys = ON;
 
 INSERT INTO Customers (name, address) VALUES ('Bjudkakor AB', 'Ystad');
 INSERT INTO Customers (name, address) VALUES ('Finkakor AB', 'Helsingborg');
@@ -89,3 +87,30 @@ INSERT INTO Recipes (cookie, raw_material, amount, unit) VALUES ('Tango', 'Flour
 INSERT INTO Recipes (cookie, raw_material, amount, unit) VALUES ('Tango', 'Sodium bicarbonate', 4, 'g');
 INSERT INTO Recipes (cookie, raw_material, amount, unit) VALUES ('Tango', 'Sugar', 250, 'g');
 INSERT INTO Recipes (cookie, raw_material, amount, unit) VALUES ('Tango', 'Vanilla', 2, 'g');
+
+CREATE TABLE IF NOT EXISTS Pallets(
+	id				INTEGER IDENTITY NOT NULL,
+	cookie			VARCHAR(100) NOT NULL,
+	production_date	TIMESTAMP NOT NULL,
+	order_id		INTEGER,
+	delivered_at	TIMESTAMP,
+	blocked			BOOLEAN NOT NULL,
+
+	FOREIGN KEY (order_id) REFERENCES Orders(id),
+	FOREIGN KEY (cookie) REFERENCES Cookies(name)
+);
+--detta är för att testa kod 
+
+INSERT INTO Customers (name, address) VALUES ('JonDow', 'Neverland');
+INSERT INTO Orders (id, customer_name,order_made_at,desired_delivery_date) VALUES (101,'JonDow', 2018-01-01,2018-01-01);
+
+INSERT INTO Pallets(0,'Amneris',2018-01-01,101,2018-01-01,false);
+INSERT INTO Pallets(0,'Amneris',2018-01-01,101,2018-01-01,false);
+INSERT INTO Pallets(0,'Amneris',2018-01-01,101,2018-01-01,false);
+INSERT INTO Pallets(0,'Berliner',2018-01-01,101,2018-01-01,false);
+INSERT INTO Pallets(0,'Nut ring',2018-01-01,101,2018-01-01,false);
+INSERT INTO Pallets(0,'Nut ring',2018-01-01,101,2018-01-01,false);
+INSERT INTO Pallets(0,'Tango',2018-01-01,101,2018-01-01,false);
+
+
+

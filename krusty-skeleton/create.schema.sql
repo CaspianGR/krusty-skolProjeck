@@ -1,12 +1,26 @@
-SET DATABASE SQL LOWER CASE IDENTIFIER TRUE;
+-- Aktivera främmande nycklar
+PRAGMA foreign_keys = ON;
 
+-- Ta bort gamla tabeller 
+PRAGMA foreign_keys = OFF; -- SQLite 
+drop table if exists Customers;
+drop table if exists Orders;
+drop table if exists Cookies;
+drop table if exists Pallets;
+drop table if exists OrderLines;
+drop table if exists RawMaterials;
+drop table if exists Recipes;
+PRAGMA foreign_keys = ON; -- SQLite
+
+
+
+--SET DATABASE SQL LOWER CASE IDENTIFIER TRUE;
 CREATE TABLE IF NOT EXISTS Customers(
 	name			VARCHAR(100),
 	address			VARCHAR(200),
 
 	PRIMARY KEY (name)
 );
-
 CREATE TABLE IF NOT EXISTS Orders(
 	id				INTEGER IDENTITY NOT NULL,
 	customer_name	VARCHAR(100) NOT NULL,
@@ -15,13 +29,11 @@ CREATE TABLE IF NOT EXISTS Orders(
 
 	FOREIGN KEY (customer_name) REFERENCES Customers(name)
 );
-
 CREATE TABLE IF NOT EXISTS Cookies(
 	name			VARCHAR(100),
 
 	PRIMARY KEY (name)
 );
-
 CREATE TABLE IF NOT EXISTS Pallets(
 	id				INTEGER IDENTITY NOT NULL,
 	cookie			VARCHAR(100) NOT NULL,
@@ -33,7 +45,6 @@ CREATE TABLE IF NOT EXISTS Pallets(
 	FOREIGN KEY (order_id) REFERENCES Orders(id),
 	FOREIGN KEY (cookie) REFERENCES Cookies(name)
 );
-
 CREATE TABLE IF NOT EXISTS OrderLines(
 	order_id		INTEGER NOT NULL,
 	cookie			VARCHAR(100) NOT NULL,
@@ -43,7 +54,6 @@ CREATE TABLE IF NOT EXISTS OrderLines(
 	FOREIGN KEY (order_id) REFERENCES Orders(id),
 	FOREIGN KEY (cookie) REFERENCES Cookies(name)
 );
-
 CREATE TABLE IF NOT EXISTS RawMaterials(
 	name			VARCHAR(100) NOT NULL,
 	amount			INTEGER NOT NULL,
@@ -53,7 +63,6 @@ CREATE TABLE IF NOT EXISTS RawMaterials(
 
 	PRIMARY KEY (name)
 );
-
 CREATE TABLE IF NOT EXISTS Recipes(
 	cookie			VARCHAR(100) NOT NULL,
 	raw_material	VARCHAR(100) NOT NULL,
